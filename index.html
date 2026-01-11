@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bolão Copa 2026</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #e9ecef; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 450px; }
+        h2 { color: #005c2b; text-align: center; margin-top: 0; }
+        label { display: block; margin-top: 10px; font-weight: bold; color: #555; }
+        input, select { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
+        button { width: 100%; background-color: #005c2b; color: white; border: none; padding: 15px; margin-top: 20px; border-radius: 8px; cursor: pointer; font-size: 18px; font-weight: bold; transition: 0.3s; }
+        button:hover { background-color: #007d3a; }
+        
+        .postagem { background: #f8f9fa; border-left: 5px solid #ffdf00; padding: 15px; margin-top: 15px; border-radius: 5px; position: relative; }
+        .postagem strong { color: #005c2b; }
+        .valor-tag { position: absolute; top: 15px; right: 15px; background: #d4edda; color: #155724; padding: 5px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; }
+        #listaApostas { margin-top: 30px; width: 100%; max-width: 450px; }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h2>🏆 Faça seu Palpite!</h2>
+        
+        <label>Seu Nome:</label>
+        <input type="text" id="nome" placeholder="Digite seu nome">
+
+        <label>Valor da Aposta (R$):</label>
+        <input type="number" id="valor" placeholder="Ex: 20.00">
+
+        <label>Quem vence?</label>
+        <select id="timeVencedor">
+            <option value="Brasil 🇧🇷">Brasil 🇧🇷</option>
+            <option value="Espanha 🇪🇸">Espanha 🇪🇸</option>
+            <option value="França 🇫🇷">França 🇫🇷</option>
+            <option value="Argentina 🇦🇷">Argentina 🇦🇷</option>
+            <option value="Outro">Outro</option>
+        </select>
+
+        <label>Quantos gols esse time fará?</label>
+        <input type="number" id="gols" placeholder="Ex: 3">
+
+        <button onclick="postarAposta()">Postar Aposta 🚀</button>
+    </div>
+
+    <div id="listaApostas">
+        </div>
+
+    <script>
+        // Função para carregar as apostas que já estão no "banco" (LocalStorage)
+        function carregarApostas() {
+            const apostas = JSON.parse(localStorage.getItem('bolao2026') || '[]');
+            const listaDiv = document.getElementById('listaApostas');
+            listaDiv.innerHTML = apostas.length > 0 ? "<h3>Palpites Recentes:</h3>" : "";
+
+            // Mostra do mais novo para o mais antigo
+            apostas.reverse().forEach(a => {
+                listaDiv.innerHTML += `
+                    <div class="postagem">
+                        <span class="valor-tag">R$ ${a.valor}</span>
+                        <p><strong>${a.nome}</strong> postou:</p>
+                        <p>Vencedor: <b>${a.vencedor}</b></p>
+                        <p>Placar previsto: <b>${a.gols} gol(s)</b></p>
+                        <small style="color: #999">${a.data}</small>
+                    </div>
+                `;
+            });
+        }
+
+        function postarAposta() {
+            const nome = document.getElementById('nome').value;
+            const valor = document.getElementById('valor').value;
+            const vencedor = document.getElementById('timeVencedor').value;
+            const gols = document.getElementById('gols').value;
+
+            if(!nome || !valor || !gols) {
+                alert("Por favor, preencha todos os campos!");
+                return;
+            }
+
+            const novaAposta = {
+                nome: nome,
+                valor: parseFloat(valor).toFixed(2),
+                vencedor: vencedor,
+                gols: gols,
+                data: new Date().toLocaleString('pt-BR')
+            };
+
+            // Salva no LocalStorage
+            const apostas = JSON.parse(localStorage.getItem('bolao2026') || '[]');
+            apostas.push(novaAposta);
+            localStorage.setItem('bolao2026', JSON.stringify(apostas));
+
+            // Limpa o formulário
+            document.getElementById('nome').value = '';
+            document.getElementById('valor').value = '';
+            document.getElementById('gols').value = '';
+
+            // Atualiza a lista na tela
+            carregarApostas();
+            alert("Palpite postado com sucesso!");
+        }
+
+        // Inicia o sistema carregando os dados salvos
+        carregarApostas();
+    </script>
+
+</body>
+</html>
